@@ -62,6 +62,20 @@ Throughput - The rate of data flow (inBytes+ outBytes) during that minute.
 
 1个instance的上限是22.2Mbps
 
+=======
+由于无法知道底层istance的数量，这个数值依然不是做告警的好的数值
+
+### 从延迟考虑
+
+延迟比较好，当延迟明显增大的时候，设置告警，并认为直接操作是最合理的建议
+
+选择Application Gateway total time作为优先的告警选择，一旦大于一个值，说明就该考虑手动scaling了
+
+![image-20240318151618035](./%E8%AE%BE%E7%BD%AE%E5%90%88%E7%90%86%E7%9A%84AppGW%E5%91%8A%E8%AD%A6%E6%9C%BA%E5%88%B6.assets/image-20240318151618035.png)
+
+>>>>>>> d3f269eac0cf67cdda96a47342d2f7055619e85e
+
+<<<<<<< HEAD
 # 我建议可以这样设置告警
 
 比如兔兔设置的instance上限设置的是100，下限设置的是50，那么：
