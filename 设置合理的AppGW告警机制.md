@@ -62,3 +62,26 @@ Throughput - The rate of data flow (inBytes+ outBytes) during that minute.
 
 1个instance的上限是22.2Mbps
 
+# 我建议可以这样设置告警
+
+比如兔兔设置的instance上限设置的是100，下限设置的是50，那么：
+
+1. Current Capacity Unit -  Count of processor capacity consumed. Factors affecting compute unit are TLS connections/sec, URL Rewrite computations, and WAF rule processing. 
+   1. 设置3个告警；
+   2. 第一个告警设置为Current Capacity Unit数量为501，代表CU数量超出了文档标准的baseline（1instance=10CU），可能会开始触发scaling，这种情况用于提示极兔运维团队超出baseline的规定，scaling随时可能会发生；
+   3. 第二个告警设置为Current Capacity Unit数量为800（我采用了80%这个比例，1000*80%），首先这种情况有一定概率instance已经开始scaling（如我前面说的，因为我们测试下来有的instance甚至能出来100+的CU），所以作为一个指标放在这里作为80%的水位线；
+   4. 第三个告警设置为Current Capacity Unit数量为1000，因为这种情况可能就是当前100这个上限能弹出来的最多的instance了，虽然大概率还有可能有额外的CU能撑住，但是已经弹不出新的instance了，这种时候运维一定要参与，手动调整instance数量。
+2. New connections per second - The average number of new TCP connections per second established from clients to the Application Gateway and from the Application Gateway to the backend members. 
+   1. 设置3个告警：
+   2. 和上面同理，第一个告警为2500*10*50 = 1,250,000，是下限baseline
+   3. 第二个告警为2500*10*100*80%=2,000,000，是80%的水位线
+   4. 第三个告警为2500*10*100=2,500,000，是上限baseline，同时也是到达了必须运维参与手动调整instance的阶段了
+3. Throughput：
+   1. 同上设置3个告警
+   2. 第一个告警为2.22Mbps*10*50=1110 Mbps，作为下限baseline
+   3. 第二个告警为2.22Mbps*10*100*80%=1776 Mbps，作为80%水位线
+   4. 第三个告警为2.22Mbps*10*100=2,220 Mbps，作为上限baseline，同时也是到达了必须运维参与手动调整instance的阶段了
+
+
+
+只有这三组参数和scaling instance相关，所以综合考虑，利用上下限来分别设置告警可能最合适
